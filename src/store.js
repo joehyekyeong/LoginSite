@@ -1,11 +1,14 @@
 import 'es6-promise/auto'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import router from './router'
+
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
+        userInfo: null,
         allUsers:[
             {id: 1, name:'num', email:'num@gmail.com', password: '123'},
             {id: 2, name:'nam', email:'nam@gmail.com', password: '123'}
@@ -15,9 +18,10 @@ export default new Vuex.Store({
     },
     mutations: {
         // 로그인을 성공했을 때,
-        loginSuccess(state){
+        loginSuccess(state, payload){
             state.isLogin = true
             state.isLoginError = false
+            state.userInfo = payload
         },
         // 로그인을 실패했을 때
         loginError(state){
@@ -32,11 +36,17 @@ export default new Vuex.Store({
             state.allUsers.forEach(user => {
                 if(user.email === loginObj.email) selectedUser = user
             })
-            selectedUser === null 
-                ? commit("loginError") // null 이면 에러가 true
-                : selectedUser.password !== loginObj.password
-                 ? commit("loginError")
-                 : commit("loginSuccess")
+            // selectedUser === null 
+            //     ? commit("loginError") // null 이면 에러가 true
+            //     : selectedUser.password !== loginObj.password
+            //      ? commit("loginError")
+            //      : commit("loginSuccess")
+            if (selectedUser === null || selectedUser.password !== loginObj.password)
+                commit("loginError")
+            else {
+                commit("loginSuccess", selectedUser)
+                router.push({ name: "mypage" })
+            }
         }
     }
 })
